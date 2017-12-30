@@ -1,0 +1,29 @@
+
+    html,body,div,span,object,iframe,h1,h2,h3,h4,h5,h6,p,a,address,em,img,strong,dl,dt,dd,ol,ul,li,fieldset,form,label,legend,table,caption,tbody,tfoot,thead,tr,th,td,video{margin:0;padding:0;font-size:100%;border:0;vertical-align:baseline}
+
+    a{
+    	cursor:pointer;
+    }
+
+    .piece {
+      width: 206px;
+      height: 206px;
+    }
+
+    .wrapper {
+      width:618px;
+      height:618px;
+      margin:0;
+      padding:0;
+      vertical-align: baseline;
+      position:relative;
+    }
+
+    .wrapper ul {
+      list-style: none;
+    }
+
+    .wrapper li {
+      float: left;
+    }
+</style>

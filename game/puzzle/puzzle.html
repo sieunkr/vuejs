@@ -5,7 +5,6 @@
   <title>puzzle</title>
   <script src="https://unpkg.com/vue/dist/vue.min.js"></script>
 
-  <!-- 테스트를 위해서 HTML, CSS, JS 를 한 파일로 빠르게 구현한 것임... 원래는 js 도 분리하고 깔끔하게 작업해야 함 -->
 
   <!-- 페이스북 소셜 플러그인 연동 -->
   <div id="fb-root"></div>
@@ -17,145 +16,81 @@
     fjs.parentNode.insertBefore(js, fjs);
     }(document, 'script', 'facebook-jssdk'));
   </script>
-  <style type="text/css">
-    
-    html,body,div,span,object,iframe,h1,h2,h3,h4,h5,h6,p,a,address,em,img,strong,dl,dt,dd,ol,ul,li,fieldset,form,label,legend,table,caption,tbody,tfoot,thead,tr,th,td,video{margin:0;padding:0;font-size:100%;border:0;vertical-align:baseline}
-
-    .piece {
-      width: 206px;
-      height: 206px;
-    }
-
-    .wrapper {
-      width:618px;
-      height:618px;
-      margin:0;
-      padding:0;
-      vertical-align: baseline;
-      position:relative;
-    }
-
-    .wrapper ul {
-      list-style: none;
-    }
-
-    .wrapper li {
-      float: left;
-    }
-</style>
-
+  <link rel="stylesheet" type="text/css" href="main.css"/>
 </head>
 
 
-Vue.js 스터디 2일차 - 샘플 소스(리팩토링 하기 전..)
-<br />
-- 구현 시간 : 3시간
-<br />
-- 추후 소스 리팩토링 예정
+
+Vue.js 스터디 2일차 - 샘플 소스
 <br />
 - 크롬에서만 정상 작동함
 <br />
-- 퍼즐을 맞추면 됨. 힌트는, 정사각형의 각 모서리에 표시가 되어있음.
-
-
-<h1><time>00:00:00</time></h1>
-<button id="start">start</button>
-<button id="stop">stop</button>
-<button id="clear">clear</button>
-
+- 퍼즐을 맞추면 됨. 마우스로 클릭하면 퍼즐이 이동함. 
 <br />
+- 힌트 = 정사각형의 각 모서리에 표시가 되어있음.
 <br />
-<br />
+- F5 또는 새로고침을 하면 초기화 됨
 
 
-<!-- child Template 선언-->
+<br /><br /><br />
+
+
+
+<!-- 자식 컴포넌트(Child Template)-->
 <template id="childTemplate">
   <li class="piece">
-    <a v-on:click="clickEvent"><img v-bind:src="info.src" v-bind:data-numb="info.value" v-bind:data-index="info.index"/></a>
+    <a v-on:click="clickEvent"><img v-bind:src="piece.src" v-bind:data-numb="piece.value" v-bind:data-index="piece.index"/></a>
   </li>
 </template>
 
+<!-- js 파일로 분리 해야 함-->
 <script type="text/javascript">
+  Vue.config.devtools = true;
+
+    
+
   Vue.component('child-component', {
       template : '#childTemplate',
-      props : [ 'info' ],
+      props : [ 'piece' ],
       methods : {
           clickEvent : function(e) {
-              this.$emit('puzzleclick', e.target.dataset.numb, e.target.dataset.index);
+              this.$emit('puzzleclick', e.target.dataset.index);
           }
       }
   })
 </script>
 
-
-<!-- 타이머, 구글에서 검색한 소스, 내가 짠거 아님 -->
-<script type="text/javascript">  
-  var h1 = document.getElementsByTagName('h1')[0],
-    start = document.getElementById('start'),
-    stop = document.getElementById('stop'),
-    clear = document.getElementById('clear'),
-    seconds = 0, minutes = 0, hours = 0,
-    t;
-
-  function add() {
-      seconds++;
-      if (seconds >= 60) {
-          seconds = 0;
-          minutes++;
-          if (minutes >= 60) {
-              minutes = 0;
-              hours++;
-          }
-      }
-      
-      h1.textContent = (hours ? (hours > 9 ? hours : "0" + hours) : "00") + ":" + (minutes ? (minutes > 9 ? minutes : "0" + minutes) : "00") + ":" + (seconds > 9 ? seconds : "0" + seconds);
-
-      timer();
-  }
-  function timer() {
-      t = setTimeout(add, 1000);
-  }
-  timer();
-  /* Start button */
-  start.onclick = timer;
-
-  /* Stop button */
-  stop.onclick = function() {
-      clearTimeout(t);
-  }
-
-  /* Clear button */
-  clear.onclick = function() {
-      h1.textContent = "00:00:00";
-      seconds = 0; minutes = 0; hours = 0;
-  }
-
-</script>
-
-<!-- 궁금한 점, template 안에 div 태그가 꼭 있어야 하는지??? -->
-<!-- child template 로 index 전달할 수 있는지?? -->
+<!-- 부모 컴포넌트(Parent Template)-->
+<!-- 궁금 1 = template 안에 div 태그가 꼭 있어야 하는지? -->
+<!-- 궁금 2 = child template 로 index 값 전달 할 수 있는지? -->
 <template id="parentTemplate">
   <div class="wrapper">
+      <h1>퍼즐 이동 횟수 : {{ counter }}</h1>
+      <br />
       <ul>
-        <child-component v-for="s in puzzles" v-bind:info="s" v-on:puzzleclick="puzzleclickEvent">
+        <child-component v-for="s in puzzles" v-bind:piece="s" v-on:puzzleclick="puzzleclickEvent">
         </child-component>
       </ul>
   </div>
 </template>
 
+<!-- js 파일로 분리 해야 함-->
 <script type="text/javascript">
 
   var emptyNum = 9;
   Vue.component('parent-component', {
       template : '#parentTemplate',
       props : [ 'puzzles' ],
+      data: function () {
+        return {
+          counter: 0
+        }
+      },
       methods : {
-          puzzleclickEvent : function(k, i) {
+          puzzleclickEvent : function(i) {
+
             //alert("테스트"+ k + "___" + i);
 
-
-            //퍼즐 바꾸는 로직
-            //이부분 깔끔하게 리랙토링 가능한지?
             var isEnablePuzzleChanged = false;
             if((i == 1 & (emptyNum == 2 || emptyNum == 4))           
               || (i == 2 & (emptyNum == 1 || emptyNum == 3 || emptyNum == 5)) 
@@ -167,18 +102,18 @@ Vue.js 스터디 2일차 - 샘플 소스(리팩토링 하기 전..)
               || (i == 8 & (emptyNum == 9 || emptyNum == 5 || emptyNum == 7))
               || (i == 9 & (emptyNum == 6 || emptyNum == 8)))
             {
-
+              this.counter += 1;
               isEnablePuzzleChanged = true;
             }
             
 
             if(isEnablePuzzleChanged){
 
-                pz[emptyNum-1]["src"] = pz[i-1]["src"];
-                pz[emptyNum-1]["value"] = pz[i-1]["value"];
+                puzzlesDataOrigin[emptyNum-1]["src"] = puzzlesDataOrigin[i-1]["src"];
+                puzzlesDataOrigin[emptyNum-1]["value"] = puzzlesDataOrigin[i-1]["value"];
 
-                pz[i-1]["src"] = "";
-                pz[i-1]["value"] = "9";
+                puzzlesDataOrigin[i-1]["src"] = "";
+                puzzlesDataOrigin[i-1]["value"] = "9";
 
                 emptyNum = i;
             }
@@ -186,7 +121,7 @@ Vue.js 스터디 2일차 - 샘플 소스(리팩토링 하기 전..)
 
             var isFinish = true;
             for(i = 0; i < 8; i++){
-              if(i + 1 == pz[i]["value"]){
+              if(i + 1 == puzzlesDataOrigin[i]["value"]){
 
               }
               else{
@@ -199,16 +134,17 @@ Vue.js 스터디 2일차 - 샘플 소스(리팩토링 하기 전..)
               alert("성공했습니다!!");
 
               stop.onclick();
-
-
             }
 
           }
+    	
 
-        
       }
   })
 </script>
+
+
+
 
 
 <body>
@@ -224,7 +160,7 @@ Vue.js 스터디 2일차 - 샘플 소스(리팩토링 하기 전..)
   
   var emptyNum;
 
-  var pz = [ 
+  var puzzlesDataOrigin = [ 
               { src : "pic_01.png", value : "1",}, 
               { src : "pic_02.png", value : "2" },
               { src : "pic_03.png", value : "3" },
@@ -237,13 +173,13 @@ Vue.js 스터디 2일차 - 샘플 소스(리팩토링 하기 전..)
           ];
 
 
-  shuffle(pz);
+  shuffle(puzzlesDataOrigin);
 
-  Vue.config.devtools = true;
+ 
   var vm = new Vue({
       el : "#content",
       data : {
-          puzzles : pz
+          puzzles : puzzlesDataOrigin
       }
   })
 
@@ -264,7 +200,6 @@ Vue.js 스터디 2일차 - 샘플 소스(리팩토링 하기 전..)
     }
   }
 </script>
-
 
 
 <br />
