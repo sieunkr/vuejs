@@ -318,8 +318,56 @@ clean.delete << file('node_modules')
 
 
 
-## Vue 기본 구성
-작성 중...
+## Vue SPA 심화
+
+#### vue 파일 구조
+vue 컴포넌트는 기본적으로 아래와 같은 구조로 구성된다. 
+
+```javascript
+<template>  
+	<div> 
+	
+	</div>
+</template>  
+  
+<script>  
+  export default {  
+        data() {  
+            return {  
+            }  
+        },  
+  mounted() {  
+        },  
+  methods: {  
+        }  
+    };  
+</script>
+<style>
+</styld>
+```
+template 에는 id 를 설정하지 않는다. 그리고 반드시 div 태그가 있어야 한다. 해당 컴포넌트 파일의 시작점은 바로 webpack 에서 엔트리로 지정된 파일에서 시작한다. 필자는 엔트리 파일로 /src/main/js/app.js 를 지정하였고, 해당 파일에는 아래와 같이 작성하였다. 
+
+```javascript
+생략...
+new Vue({  
+        router,  
+  render: h => h(App)  
+}).$mount('#app');
+```
+그리고 실행되는 html 에는 번들링되어 생성된 bundle.js 파일을 호출한다. 
+```html
+생략...
+<div id="app"></div>
+<script src="[/js/bundle.js](http://localhost:8082/js/bundle.js)"></script>
+</body>
+```
+
+
+#### 라우팅 설정
+
+
+ 작성중...
+
 
 
 
